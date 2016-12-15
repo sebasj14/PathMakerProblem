@@ -1,87 +1,184 @@
 package main;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 /**
+ * Solution to the traveler problem.
+ *
  * @author Sebastián Jiménez (sjimenezc)
  */
 public class PathMakerProblem {
+
+	/** Character that indicates the traveler to go left. */
+	private static final char LEFT = 'L';
+
+	/** Character that indicates the traveler to go right. */
+	private static final char RIGHT = 'R';
+
+	/** Character that indicates the traveler to go up. */
+	private static final char UP = 'U';
+
+	/** Character that indicates the traveler to go down. */
+	private static final char DOWN = 'D';
+
+	/** Map containing the directions as keys and its opposites as values. */
+	private static final Map<Character, Character> OPPOSITE_DIRECTION = new HashMap<>();
+
+	static {
+		OPPOSITE_DIRECTION.put(LEFT, RIGHT);
+		OPPOSITE_DIRECTION.put(RIGHT, LEFT);
+		OPPOSITE_DIRECTION.put(UP, DOWN);
+		OPPOSITE_DIRECTION.put(DOWN, UP);
+	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println(makePath(args[0]));
+		System.out.println(getNumberOfChanges(args[0]));
 	}
 
-	public static int makePath(String path) {
-		int pathLength = path.length();
-		if (pathLength % 4 != 0) {
+	/**
+	 * Obtains the number of changes that the traveler must do in his directions
+	 * to go back to the starting point.
+	 *
+	 * @param path
+	 *          string that represents the directions for the traveler.
+	 * @return number of changes made to the path.
+	 */
+	public static int getNumberOfChanges(String path) {
+		if (path.length() % 2 != 0) {
 			return -1;
 		}
 
 		Map<Character, Integer> charCount = getCharCount(path);
-
 		return getNumberOfChanges(charCount);
 	}
 
+	/**
+	 * From the map of occurrences, calculates the number of changes that the
+	 * traveler needs in his path to go back to the starting point.
+	 *
+	 * @param charCount
+	 *          map with the occurrences for every direction in the path given.
+	 * @return number of changes made to the path.
+	 */
 	private static int getNumberOfChanges(Map<Character, Integer> charCount) {
-		if (isCountEqual(charCount)) {
+		if (isCountZero(charCount)) {
 			return 0;
 		}
 
-		Entry<Character, Integer> minEntry = getMinEntry(charCount);
-		Entry<Character, Integer> maxEntry = getMaxEntry(charCount);
+		Character maxHorizontal = getMaxHorizontalDirection(charCount);
+		Character minHorizontal = OPPOSITE_DIRECTION.get(maxHorizontal);
+		Character maxVertical = getMaxVerticalDirection(charCount);
+		Character minVertical = OPPOSITE_DIRECTION.get(maxVertical);
 
-		charCount.put(maxEntry.getKey(), maxEntry.getValue() - 1);
-		charCount.put(minEntry.getKey(), minEntry.getValue() + 1);
+		int numberOfChanges = 0;
+		if (!isHorizontalCountZero(charCount)) {
+			charCount.put(maxHorizontal, charCount.get(maxHorizontal) - 1);
+			charCount.put(minHorizontal, charCount.get(minHorizontal) + 1);
+			numberOfChanges++;
+		}
+		if (!isVerticalCountZero(charCount)) {
+			charCount.put(maxVertical, charCount.get(maxVertical) - 1);
+			charCount.put(minVertical, charCount.get(minVertical) + 1);
+			numberOfChanges++;
+		}
 
-		return 1 + getNumberOfChanges(charCount);
+		return numberOfChanges + getNumberOfChanges(charCount);
 	}
 
-	private static Map<Character, Integer> getCharCount(String s) {
+	/**
+	 * Counts how many occurrences there are for each direction and returns it as
+	 * a map.
+	 *
+	 * @param path
+	 *          sequence of directions as a string.
+	 * @return map which key is a direction and its value is the number of
+	 *         occurrences in the path.
+	 */
+	private static Map<Character, Integer> getCharCount(String path) {
 		Map<Character, Integer> charCount = new HashMap<Character, Integer>();
-		charCount.put('L', 0);
-		charCount.put('R', 0);
-		charCount.put('U', 0);
-		charCount.put('D', 0);
+		charCount.put(LEFT, 0);
+		charCount.put(RIGHT, 0);
+		charCount.put(UP, 0);
+		charCount.put(DOWN, 0);
 
-		for (Character character : s.toCharArray()) {
+		for (Character character : path.toCharArray()) {
 			Integer count = charCount.get(character);
 			charCount.put(character, count + 1);
 		}
-
 		return charCount;
 	}
 
-	private static Entry<Character, Integer> getMaxEntry(Map<Character, Integer> charCount) {
-		Entry<Character, Integer> maxEntry = null;
-		for (Entry<Character, Integer> entry : charCount.entrySet()) {
-			if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0) {
-				maxEntry = entry;
-			}
-		}
-
-		return maxEntry;
+	/**
+	 * Gets the vertical direction with the most occurrences.
+	 *
+	 * @param charCount
+	 *          map which key is a direction and its value is the number of
+	 *          occurrences in the path.
+	 * @return character with the vertical direction with the maximum number of
+	 *         occurrences.
+	 */
+	private static Character getMaxVerticalDirection(Map<Character, Integer> charCount) {
+		return charCount.get(UP) - charCount.get(DOWN) > 0 ? UP : DOWN;
 	}
 
-	private static Entry<Character, Integer> getMinEntry(Map<Character, Integer> charCount) {
-		Entry<Character, Integer> minEntry = null;
-		for (Entry<Character, Integer> entry : charCount.entrySet()) {
-			if (minEntry == null || entry.getValue().compareTo(minEntry.getValue()) < 0) {
-				minEntry = entry;
-			}
-		}
-
-		return minEntry;
+	/**
+	 * Gets the horizontal direction with the most occurrences.
+	 *
+	 * @param charCount
+	 *          map which key is a direction and its value is the number of
+	 *          occurrences in the path.
+	 * @return character with the horizontal direction with the maximum number of
+	 *         occurrences.
+	 */
+	private static Character getMaxHorizontalDirection(Map<Character, Integer> charCount) {
+		return charCount.get(LEFT) - charCount.get(RIGHT) > 0 ? LEFT : RIGHT;
 	}
 
-	private static boolean isCountEqual(Map<Character, Integer> charCount) {
-		Collection<Integer> values = charCount.values();
-		return Collections.max(values).compareTo(Collections.min(values)) == 0;
+	/**
+	 * Returns true if there is the same number of occurrences for each direction
+	 * in the same axis.
+	 *
+	 * @param charCount
+	 *          map which key is a direction and its value is the number of
+	 *          occurrences in the path.
+	 * @return true if both the amount of horizontal and vertical directions is
+	 *         zero. False otherwise.
+	 */
+	private static boolean isCountZero(Map<Character, Integer> charCount) {
+		return isHorizontalCountZero(charCount) && isVerticalCountZero(charCount);
 	}
+
+	/**
+	 * Returns true if there is the same number of occurrences for each horizontal
+	 * direction.
+	 *
+	 * @param charCount
+	 *          map which key is a direction and its value is the number of
+	 *          occurrences in the path.
+	 * @return true if the amount of horizontal directions is zero. False
+	 *         otherwise.
+	 */
+	private static boolean isHorizontalCountZero(Map<Character, Integer> charCount) {
+		int horizontalCount = charCount.get(LEFT) - charCount.get(RIGHT);
+		return horizontalCount == 0;
+	}
+
+	/**
+	 * Returns true if there is the same number of occurrences for each vertical
+	 * direction.
+	 *
+	 * @param charCount
+	 *          map which key is a direction and its value is the number of
+	 *          occurrences in the path.
+	 * @return true if the amount of vertical directions is zero. False otherwise.
+	 */
+	private static boolean isVerticalCountZero(Map<Character, Integer> charCount) {
+		int verticalCount = charCount.get(UP) - charCount.get(DOWN);
+		return verticalCount == 0;
+	}
+
 }
