@@ -51,7 +51,7 @@ public class PathMakerProblem {
 	 */
 	public static int getNumberOfChanges(String path) {
 		int pathLength = path.length();
-		if (pathLength > 100000 || pathLength % 2 != 0) {
+		if (pathLength < 1 || pathLength > 100000 || pathLength % 2 != 0) {
 			return -1;
 		}
 
