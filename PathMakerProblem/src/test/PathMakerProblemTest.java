@@ -10,7 +10,7 @@ public class PathMakerProblemTest {
 
 	@Test
 	public void testEmptyPath() {
-		int expectedResult = 0;
+		int expectedResult = -1;
 		int actualResult = PathMakerProblem.getNumberOfChanges("");
 		assertEquals(expectedResult, actualResult);
 	}
