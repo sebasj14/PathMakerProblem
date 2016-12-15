@@ -36,7 +36,7 @@ public class PathMakerProblem {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		System.out.println(getNumberOfChanges(br.readLine()));
 	}
@@ -50,7 +50,8 @@ public class PathMakerProblem {
 	 * @return number of changes made to the path.
 	 */
 	public static int getNumberOfChanges(String path) {
-		if (path.length() % 2 != 0) {
+		int pathLength = path.length();
+		if (pathLength > 100000 || pathLength % 2 != 0) {
 			return -1;
 		}
 
