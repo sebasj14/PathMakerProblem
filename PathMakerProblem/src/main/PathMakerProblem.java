@@ -1,12 +1,13 @@
 package main;
 
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Solution to the traveler problem.
  *
- * @author Sebastián Jiménez (sjimenezc)
+ * @author Sebastian Jimenez (sjimenezc)
  */
 public class PathMakerProblem {
 
@@ -36,7 +37,8 @@ public class PathMakerProblem {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println(getNumberOfChanges(args[0]));
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println(getNumberOfChanges(br.readLine()));
 	}
 
 	/**
